@@ -44,27 +44,25 @@ else
 	@echo "abigen already installed; skipping..."
 endif
 
-go-mod:
+deps: contract-tools
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
 	go mod download
 	go mod tidy
 
-dep: go-mod contract-tools
-	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
-
-install: dep  ## Build pgcenter executable.
-	CGO_ENABLED=0 GOARCH=${GOARCH}
-	go install cmd/canaveral.go
-
-clean: ## Clean build directory.
-	rm -rf ./artifacts/bin/
-	rm -rf ./artifacts/abi/
-
-
-lint:  ## Lint the source files
+lint: deps
 	golangci-lint run  --timeout 5m
 
-test: go-mod
+test: deps
 	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
 	go get github.com/onsi/gomega/...
 	export PATH=$PATH:$(go env GOPATH)/bin
 	ginkgo ./...
+	go mod tidy
+
+install: deps
+	CGO_ENABLED=0 GOARCH=${GOARCH}
+	go install cmd/canaveral.go
+
+clean:
+	rm -rf ./artifacts/bin/
+	rm -rf ./artifacts/abi/
