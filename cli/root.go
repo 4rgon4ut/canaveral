@@ -44,7 +44,7 @@ func (r *RootCmd) Run() {
 	}
 }
 
-//nolint:all
+//nolint:govet
 func exampleCommand(a *app.App) *cobra.Command {
 	return &cobra.Command{
 		Use:   "example",
