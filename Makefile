@@ -31,22 +31,6 @@ ifeq (, $(shell which go-bindata))
 else
 	@echo "go-bindata already installed; skipping..."
 endif
-
-ifeq (, $(shell which gencodec))
-	@echo "Installing gencodec..."
-	@go install github.com/fjl/gencodec@latest
-else
-	@echo "gencodec already installed; skipping..."
-endif
-
-ifeq (, $(shell which protoc-gen-go))
-	@echo "Installing protoc-gen-go..."
-	@go install github.com/fjl/gencodeclatest
-	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-else
-	@echo "protoc-gen-go already installed; skipping..."
-endif
-
 ifeq (, $(shell which protoc-gen-go-grpc))
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 else
@@ -59,14 +43,6 @@ ifeq (, $(shell which solhint))
 else
 	@echo "solhint already installed; skipping..."
 endif
-
-ifeq (, $(shell which solcjs))
-	@echo "Installing solcjs..."
-	@npm install -g solc@0.5.11
-else
-	@echo "solcjs already installed; skipping..."
-endif
-
 ifeq (, $(shell which solc))
 	@echo "Installing solc..."
 	@snap install solc
