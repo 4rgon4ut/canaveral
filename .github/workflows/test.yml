@@ -1,7 +1,20 @@
-name: Test
-on: [push, pull_request]
+name: Tests
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
 
 jobs:
+  cleanup-runs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rokroskar/workflow-run-cleanup-action@master
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    if: "!startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/heads/main'"
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -17,5 +30,7 @@ jobs:
             **/**.go
             go.mod
             go.sum
+      - name: Test
         run: |
           make test
+        if: env.GIT_DIFF

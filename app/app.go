@@ -10,7 +10,6 @@ import (
 )
 
 type App struct {
-	// cli
 	EVMClient *evmclient.Client
 
 	ERC20Instance ERC20Minimal
