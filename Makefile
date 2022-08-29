@@ -64,7 +64,7 @@ go-mod:
 dep: go-mod contract-tools
 
 build: dep  ## Build pgcenter executable.
-	CGO_ENABLED=0 GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o ./${APP_NAME} ./cmd/main
+	CGO_ENABLED=0 GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o ./${APP_NAME} ./cmd/main.go
 
 clean: ## Clean build directory.
 	rm -rf ./artifacts/bin/
@@ -75,4 +75,7 @@ lint: dep  ## Lint the source files
 	golangci-lint run  --timeout 5m
 
 test: dep
+	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
+	go get github.com/onsi/gomega/...
+	export PATH=$PATH:$(go env GOPATH)/bin
 	ginkgo ./...
