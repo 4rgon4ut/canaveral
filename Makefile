@@ -71,7 +71,7 @@ clean: ## Clean build directory.
 	rm -rf ./artifacts/abi/
 
 
-lint: dep  ## Lint the source files
+lint:  ## Lint the source files
 	golangci-lint run  --timeout 5m
 
 test: go-mod

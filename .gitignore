@@ -66,8 +66,8 @@ dependency-graph.png
 *.synctex.gz
 
 # Contracts
-*.bin
-*.abi
+# *.bin
+# *.abi
 
 # Node.js
 tests/**/node_modules/*
