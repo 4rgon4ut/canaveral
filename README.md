@@ -1,9 +1,11 @@
 # Welcome to Canaveral!
 Canaveral is a cli tool written in Go for compiling, deploying and making calls to solidity smart contracts on Evmos blockchain 
-(potentially on every EVM-compatible chain).
+(potentially on every EVM-compatible chain). 
+
+Another words canaveral is a launchsite for smart contracts.
 
 - [Pre-Requisites](#pre-requisites)
-- [Installation and Setup](#installation-and-setup)
+- [Dependencies and Makefile](#dependencies-and-makefile)
 - [Short Summary](#short-summary)
 - [Evmos Node](#evmos-node)
   - [Configuration](#configuration)
@@ -14,8 +16,6 @@ Canaveral is a cli tool written in Go for compiling, deploying and making calls 
 - [Further Scope](#further-scope)
 
 ## Pre-Requisites
-The following software has to be installed on your machine in order to use the 
-latest version of Evmos (currently v5.0.0):
 - [Go v1.18+](https://go.dev/)
 - [Solc](https://docs.soliditylang.org/en/v0.8.15/installing-solidity.html#macos-packages)
 - [Abigen](https://goethereumbook.org/smart-contract-compile/)
@@ -23,53 +23,88 @@ latest version of Evmos (currently v5.0.0):
 - [Ginkgo](https://onsi.github.io/ginkgo/#installing-ginkgo)
 
 ## Dependencies and Makefile
-  `solc`, `abigen`, and `golangci-lint` can be installed along with other dependencies by:
+  `solc`, `abigen`, `golangci-lint` and `ginkgo` can be installed along with other dependencies by:
   ```
   make deps
   ```
-  Full list of available make commands:
+  To get full list of available make commands:
   ```
-  Makefile available targets:
-  * help            Display this help screen.
-  * contract-tools  Install ethereum specific tools (solc, solhing, abigen, ...)
-  * deps            Install all necessary dependencies
-  * lint            Runs linting tool
-  * test            Runs all tests
-  * install         Install canaveral cli to go binaries dir
-  * clean           Clean generated artifacts
+  make help
   ```
-## Short Summary
-When you have installed the required software, configured and ran a local Evmos
-node, you can clone this repository, and install the OpenZeppelin contracts using 
-`npm install`. 
-
-When executing 
-```shell
- $ ./init.sh
-```
-an instance of the Maltcoin ERC20 token contract is deployed
-to the running localnet, the contents of transaction receipt printed, as well as 
-a simple transfer of Maltcoin tokens between two accounts executed.
 
 ## Installation
 ### 1. Firstly we need to configure Evmos local node.
-There are several ways to do that. You can find more detailed information about every way in [docs](https://docs.evmos.org/developers/localnet/single_node.html)
+There are several ways to do that. You can find more detailed information about every way in [docs](https://docs.evmos.org/developers/localnet/single_node.html).
+
 I personally prefer using docker container:
 ```sh
 docker run -it  -p 26657:26657 -p 26656:26656  -p 8545:8545  tharsishq/evmos:v8.0.0 bash  
 ```
 Configuration either be done [manually](https://docs.evmos.org/validators/quickstart/run_node.html#manual-deployment) 
-or using the `init.sh` shell script, that is contained in the 
-[Evmos GitHub repository](https://github.com/evmos/evmos).
+or using the `start-node.sh` script from 
+[canaveral](https://github.com/4rgon4ut/canaveral/blob/develop/start-node.sh) repo.
+
+To use `start-node.sh` from evmos docker container:
+```
+docker cp path/to/start-node.sh <container_id>:/target/dir
+```
+And than just run:
+```
+sh ./start-node.sh
+```
+
+Or you can run commands from `start-node.sh` one by one manually:
+```sh
+# env vars
+KEY="mykey"
+CHAINID="evmos_9000-4"
+MONIKER="localtestnet"
+KEYRING="test"
+LOGLEVEL="info"
+
+# clean evmos directory
+rm -rf ~/.evmosd/
+
+# init genesis files
+evmosd init test --chain-id=$CHAINID
+
+# generate keypair
+evmosd keys add $KEY --keyring-backend=$KEYRING
+
+# predefine validator balance and stake
+evmosd add-genesis-account $KEY 1000000000000000000000aphoton,10000000000000000000aevmos,1000000000000000000000stake --chain-id=$CHAINID
+evmosd gentx $KEY 1000000000000000000000stake --chain-id=$CHAINID --moniker=$MONIKER --keyring-backend=$KEYRING
+
+evmosd collect-gentxs
+evmosd validate-genesis
+
+# start node
+evmosd start  --log_level $LOGLEVEL  --json-rpc.api eth,txpool,personal,net,debug,web3
+```
+### 2. Add PrivateKey to Canaveral Config
+To get available key pairs run:
+```sh
+ $ evmosd keys list
+```
 
 
-### 2. Running the node
-You can start your configured Evmos node using `evmosd start` and should see blocks 
-being produced. <br>
-Now it's possible to interact with the node through the `evmosd` CLI.
+Then print private key to terminal stdout:
+```sh
+evmosd keys unsafe-export-eth-key $KEYNAME --keyring-backend test
 
 
-### Compilation
+693F03A42E6F377D2305CB036EAE9BACCC09B230041CC786252A3BD5C34ED0FA
+```
+> :warning: **THIS IS UNSAFE AND ONLY CAN BE USED FOR LOCAL ENVIROMENT!!!**
+
+
+### 3. Install CLI binary to your local go/bin
+```
+make install
+```
+
+
+## CLI 
 In order to deploy the smart contract using go, it first must be compiled using
 the Solidity compiler. We create the `.abi` as well as `.bin` files, which
 
