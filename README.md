@@ -93,6 +93,21 @@ evmosd keys unsafe-export-eth-key $KEYNAME --keyring-backend test
 ```
 > :warning: **THIS IS UNSAFE AND ONLY CAN BE USED FOR LOCAL ENVIRONMENT!!!**
 
+Add PrivateKey as `./config/config.toml` corresponding filed value
+```toml
+abi_dir = 'artifacts/abi'
+bin_dir = 'artifacts/bin'
+binds_dir = 'bindings'
+contracts_dir = 'contracts'
+
+erc20_example_address = ''
+private_key = '693F03A42E6F377D2305CB036EAE9BACCC09B230041CC786252A3BD5C34ED0FA'
+
+rpc_addr = 'http://0.0.0.0'
+rpc_port = '8545'
+
+log_level = ''
+```
 
 ### 3. Install CLI binary to your local go/bin
 ```
