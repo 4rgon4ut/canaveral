@@ -58,6 +58,7 @@ func (a *App) DeployExampleERC20() error {
 	return nil
 }
 
+// Checks address ExampleERC20 tokens balance
 func (a *App) BalanceOf(address string) error {
 	instance, err := a.getERC20Instance()
 	if err != nil {
@@ -75,6 +76,7 @@ func (a *App) BalanceOf(address string) error {
 	return nil
 }
 
+// Calls ERC20 transfer according to ERC20 specification
 func (a *App) Transfer(to string, amount string) error {
 	instance, err := a.getERC20Instance()
 	if err != nil {
@@ -97,12 +99,14 @@ func (a *App) Transfer(to string, amount string) error {
 	return nil
 }
 
+// Mints provided amount of tokens to specified address
 func (a *App) Mint(to string, amount string) error {
 	instance, err := a.getERC20Instance()
 	if err != nil {
 		return err
 	}
 	addr := common.HexToAddress(to)
+	// casting amount to proper inut type
 	n := new(big.Int)
 	n, ok := n.SetString(amount, 10)
 	if !ok {
@@ -119,6 +123,7 @@ func (a *App) Mint(to string, amount string) error {
 	return nil
 }
 
+// Burns provided amount of tokens on stored in App.ERC20Instance contract
 func (a *App) Burn(amount string) error {
 	instance, err := a.getERC20Instance()
 	if err != nil {
