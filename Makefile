@@ -16,19 +16,78 @@ help: ## Display this help screen.
 	@echo "Makefile available targets:"
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  * \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
-dep:
-	go install -mod=mod github.com/onsi/ginkgo/v2/ginkgo
-	go get github.com/onsi/gomega/...
-	go get -u github.com/ethereum/go-ethereum
-	cd $GOPATH/src/github.com/ethereum/go-ethereum/
-	make
-	make devtools
-	sudo snap install solc --edge
+
+contract-tools:
+ifeq (, $(shell which stringer))
+	@echo "Installing stringer..."
+	@go install golang.org/x/tools/cmd/stringer@latest
+else
+	@echo "stringer already installed; skipping..."
+endif
+
+ifeq (, $(shell which go-bindata))
+	@echo "Installing go-bindata..."
+	@go install github.com/kevinburke/go-bindata/go-bindata@latest
+else
+	@echo "go-bindata already installed; skipping..."
+endif
+
+ifeq (, $(shell which gencodec))
+	@echo "Installing gencodec..."
+	@go install github.com/fjl/gencodec@latest
+else
+	@echo "gencodec already installed; skipping..."
+endif
+
+ifeq (, $(shell which protoc-gen-go))
+	@echo "Installing protoc-gen-go..."
+	@go install github.com/fjl/gencodeclatest
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+else
+	@echo "protoc-gen-go already installed; skipping..."
+endif
+
+ifeq (, $(shell which protoc-gen-go-grpc))
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+else
+	@echo "protoc-gen-go-grpc already installed; skipping..."
+endif
+
+ifeq (, $(shell which solhint))
+	@echo "Installing solhint..."
+	@npm install -g solhint
+else
+	@echo "solhint already installed; skipping..."
+endif
+
+ifeq (, $(shell which solcjs))
+	@echo "Installing solcjs..."
+	@npm install -g solc@0.5.11
+else
+	@echo "solcjs already installed; skipping..."
+endif
+
+ifeq (, $(shell which solc))
+	@echo "Installing solc..."
+	@snap install solc
+else
+	@echo "solc already installed; skipping..."
+endif
+ ifeq (, $(shell which abigen))
+	@echo "Installing abigen..."
+	@add-apt-repository -y ppa:ethereum/ethereum
+	@apt-get install -y ethereum
+else
+	@echo "abigen already installed; skipping..."
+endif
 
 go-mod:
 	go mod download
+	go mod tidy
 
-build: dep go-mod ## Build pgcenter executable.
+dep: go-mod contract-tools
+
+build: dep  ## Build pgcenter executable.
 	CGO_ENABLED=0 GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o ./${APP_NAME} ./cmd/main
 
 clean: ## Clean build directory.
@@ -36,8 +95,8 @@ clean: ## Clean build directory.
 	rm -rf ./artifacts/abi/
 
 
-lint: dep go-mod ## Lint the source files
+lint: dep  ## Lint the source files
 	golangci-lint run  --timeout 5m
 
-test: dep go-mod
+test: dep
 	ginkgo ./...
