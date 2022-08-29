@@ -33,7 +33,7 @@ func NewRootCmd(a *app.App) *RootCmd {
 		mintCommand(a),
 		burnCommand(a),
 
-		// example a.k.a. DEMO command
+		// example a.k.a. DEMO cmd
 		exampleCommand(a),
 	)
 	return &RootCmd{command}
