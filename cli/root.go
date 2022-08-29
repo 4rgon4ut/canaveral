@@ -11,10 +11,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+//
 type RootCmd struct {
 	*cobra.Command
 }
 
+// Creates root cmd cobra command and register all subcommands
 func NewRootCmd(a *app.App) *RootCmd {
 	command := &cobra.Command{
 		Use:   "cn",
@@ -44,7 +46,8 @@ func (r *RootCmd) Run() {
 	}
 }
 
-//nolint:govet
+//nolint:all
+// Example command for demonstration of compilation, deploy and interaction with ExampleERC20 token contract
 func exampleCommand(a *app.App) *cobra.Command {
 	return &cobra.Command{
 		Use:   "example",
