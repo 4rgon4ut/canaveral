@@ -6,12 +6,8 @@ Another words canaveral is a launchsite for smart contracts.
 
 - [Pre-Requisites](#pre-requisites)
 - [Dependencies and Makefile](#dependencies-and-makefile)
-- [Short Summary](#short-summary)
-- [Evmos Node](#evmos-node)
-  - [Configuration](#configuration)
-  - [Running the Node](#running-the-node)
-- [ERC20 Smart Contract](#erc20-smart-contract)
-  - [Compilation](#compilation)
+- [Installation](#installation)
+- [CLI](#cli)
 - [Deployment Using Go-Ethereum](#deployment-using-go-ethereum)
 - [Further Scope](#further-scope)
 
@@ -105,27 +101,58 @@ make install
 
 
 ## CLI 
-In order to deploy the smart contract using go, it first must be compiled using
-the Solidity compiler. We create the `.abi` as well as `.bin` files, which
+As I mentioned earlier Canaveral is a cli tool, so all interaction goes by specific commands.
 
-## Deployment using go-ethereum
-
-```shell
- $ evmosd keys list
+### Base
+To see full list of commands run:
+```sh
+canaveral help
 ```
 
-This will print the list of keys with additional information like
-key name, address and public key.
-
-
-
-```shell
- $ evmosd keys unsafe-export-eth-key $KEYNAME --keyring-backend test
-693F03A42E6F377D2305CB036EAE9BACCC09B230041CC786252A3BD5C34ED0FA
+Also, you can run:
+```sh
+canaveral example
 ```
+to see special demonstration script which compile, deploy and interact with `ExampleERC20` contract.
 
+## Methods
+Canaveral have couple generic methods and some predifined for interaction with contracts which implementing specific interface(ERC20Minimal).
 
--
+### Generic
+Canaveral allows user to compile and deploy every smart contract which is valid and can be compiled by `solc`. 
+
+So, we can declare that
+```sh
+canaveral compile [contract-name]
+
+canaveral deploy [contract-name] arg1, arg2, ...
+```
+are generic methods. 
+
+But, for now, there is a restriction:
+deploying contract constructor arguments must be simple. This is beacuse casting CMD inputs(of types string) to specific for solidity types in elegant and  eficient way is complicated design problem. 
+I'm planning to spread supported types during the time. 
+
+List of supported constructor types:
+```
+<uint8> 
+
+<uint16>
+
+<uint32> 
+
+<uint64>
+
+<uint128> 
+
+<uint256>
+
+<string>
+
+<common.Address>   # specific go-ethereum address type
+
+[32]byte (or [32]uint8)
+```
 
 ## Testing
 
