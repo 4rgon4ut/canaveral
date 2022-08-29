@@ -18,25 +18,12 @@ help: ## Display this help screen.
 
 
 contract-tools:
-ifeq (, $(shell which stringer))
-	@echo "Installing stringer..."
-	@go install golang.org/x/tools/cmd/stringer@latest
-else
-	@echo "stringer already installed; skipping..."
-endif
-
 ifeq (, $(shell which go-bindata))
 	@echo "Installing go-bindata..."
 	@go install github.com/kevinburke/go-bindata/go-bindata@latest
 else
 	@echo "go-bindata already installed; skipping..."
 endif
-ifeq (, $(shell which protoc-gen-go-grpc))
-	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-else
-	@echo "protoc-gen-go-grpc already installed; skipping..."
-endif
-
 ifeq (, $(shell which solhint))
 	@echo "Installing solhint..."
 	@npm install -g solhint
@@ -62,9 +49,11 @@ go-mod:
 	go mod tidy
 
 dep: go-mod contract-tools
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@v1.49.0
 
-build: dep  ## Build pgcenter executable.
-	CGO_ENABLED=0 GOOS=linux GOARCH=${GOARCH} go build ${LDFLAGS} -o ./${APP_NAME} ./cmd/main.go
+install: dep  ## Build pgcenter executable.
+	CGO_ENABLED=0 GOARCH=${GOARCH}
+	go install cmd/canaveral.go
 
 clean: ## Clean build directory.
 	rm -rf ./artifacts/bin/
