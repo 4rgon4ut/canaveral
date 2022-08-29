@@ -231,3 +231,4 @@ Additional things, that may be done for the further development of this basic re
 
 3. Workflow and CI\CD improvements. For example, one of the first improvements may be packaging applications to docker containers.
 
+4. Think about using more `evmos`/`ethermint` primetives and abstractions(for example for key pair generation or EVM RPC calls) as some of them may be usefull.
