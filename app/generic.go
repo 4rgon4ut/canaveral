@@ -21,7 +21,7 @@ func (a *App) Compile(fileName string) error {
 		"solc",
 		"--overwrite", // overwrite existing abi files
 		"--abi",
-		fmt.Sprintf("%s/%s.sol", a.contractsDir, name), // path and name of solidity file
+		a.getContractPath(name), // path and name of solidity file
 		"-o",
 		a.abiDir, // output directory
 	).Output()
@@ -32,7 +32,7 @@ func (a *App) Compile(fileName string) error {
 		"solc",
 		"--overwrite",
 		"--bin",
-		fmt.Sprintf("%s/%s.sol", a.contractsDir, name),
+		a.getContractPath(name),
 		"-o",
 		a.binDir,
 	).Output()
@@ -43,9 +43,9 @@ func (a *App) Compile(fileName string) error {
 	_, err = exec.Command(
 		"abigen",
 		"--bin",
-		fmt.Sprintf("%s/%s.bin", a.binDir, name), // path to compiled binaries
+		a.getBinPath(name), // path to compiled binaries
 		"--abi",
-		fmt.Sprintf("%s/%s.abi", a.abiDir, name), // path to compiled abi
+		a.getABIPath(name), // path to compiled abi
 		"--pkg",
 		name, // contract name for function names generation
 		"--out",
