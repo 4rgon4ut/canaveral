@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/canaveral/utils"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 )
 
 //nolint:gosec,lll
@@ -21,7 +22,7 @@ func (a *App) Compile(fileName string) error {
 		"solc",
 		"--overwrite", // overwrite existing abi files
 		"--abi",
-		fmt.Sprintf("%s/%s.sol", a.contractsDir, name), // path and name of solidity file
+		a.getContractPath(name), // path and name of solidity file
 		"-o",
 		a.abiDir, // output directory
 	).Output()
@@ -32,7 +33,7 @@ func (a *App) Compile(fileName string) error {
 		"solc",
 		"--overwrite",
 		"--bin",
-		fmt.Sprintf("%s/%s.sol", a.contractsDir, name),
+		a.getContractPath(name),
 		"-o",
 		a.binDir,
 	).Output()
@@ -43,9 +44,9 @@ func (a *App) Compile(fileName string) error {
 	_, err = exec.Command(
 		"abigen",
 		"--bin",
-		fmt.Sprintf("%s/%s.bin", a.binDir, name), // path to compiled binaries
+		a.getBinPath(name), // path to compiled binaries
 		"--abi",
-		fmt.Sprintf("%s/%s.abi", a.abiDir, name), // path to compiled abi
+		a.getABIPath(name), // path to compiled abi
 		"--pkg",
 		name, // contract name for function names generation
 		"--out",
@@ -67,21 +68,28 @@ func (a *App) Compile(fileName string) error {
 	return nil
 }
 
-// Generic deploy smart contracts on specified EVM-compatible chain.
-func (a *App) Deploy(fileName string, args []string) error {
-	name := utils.RemoveExtension(fileName)
-	addr, tx, err := a.EVMClient.DeployContract(
-		name,
-		args,
-	)
+func (a *App) Deploy(name string, args []string) (string, string, error) {
+	name = utils.RemoveExtension(name)
+	contractABI, err := utils.GetABIObject(a.getABIPath(name))
 	if err != nil {
-		return fmt.Errorf("deployment error: %w", err)
+		return "", "", err
 	}
-	fmt.Printf(
-		"%s seccessfully deployed. \nTX hash: %s \nContract address: %s\n\n",
-		name,
-		tx.Hash().Hex(),
-		addr.Hex(),
-	)
-	return nil
+	bytecode, err := utils.GetBytecode(a.getBinPath(name))
+	if err != nil {
+		return "", "", err
+	}
+	input, err := utils.CastInputs(contractABI.Constructor.Inputs, args)
+	if err != nil {
+		return "", "", err
+	}
+	err = a.EVMClient.SetupTxOptions(0, 0)
+	if err != nil {
+		return "", "", err
+	}
+	addr, tx, _, err := bind.DeployContract(a.EVMClient.Account.Signer, *contractABI, bytecode, a.EVMClient, input...)
+	if err != nil {
+		return "", "", err
+	}
+
+	return addr.Hex(), tx.Hash().Hex(), nil
 }

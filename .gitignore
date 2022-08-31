@@ -75,3 +75,10 @@ tests-solidity/**/node_modules/*
 
 # Nix
 /result
+
+# config
+config/config.toml
+
+#artifacts
+artifacts/abi
+artifacts/bin

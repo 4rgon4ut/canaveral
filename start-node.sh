@@ -2,7 +2,7 @@
 KEY="mykey"
 CHAINID="evmos_9000-4"
 MONIKER="localtestnet"
-KEYRING="test"
+KEYRING="os"
 LOGLEVEL="info"
 
 # clean evmos directory
