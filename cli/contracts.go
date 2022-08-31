@@ -1,6 +1,8 @@
 package cli
 
 import (
+	"fmt"
+
 	"github.com/canaveral/app"
 	"github.com/spf13/cobra"
 )
@@ -27,9 +29,16 @@ func deployCommand(a *app.App) *cobra.Command {
 		Long:  `This command receives a contract name and deploys it to the blockchain`,
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err := a.Deploy(args[0], args[1:]); err != nil {
+			addr, tx, err := a.Deploy(args[0], args[1:])
+			if err != nil {
 				return err
 			}
+			fmt.Printf(
+				"%s seccessfully deployed. \nTX hash: %s \nContract address: %s\n\n",
+				args[0],
+				tx,
+				addr,
+			)
 			return nil
 		},
 	}

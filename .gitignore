@@ -75,3 +75,5 @@ tests-solidity/**/node_modules/*
 
 # Nix
 /result
+
+config/config.toml

@@ -5,6 +5,7 @@ import (
 	"os/exec"
 
 	"github.com/canaveral/utils"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 )
 
 //nolint:gosec,lll
@@ -67,21 +68,33 @@ func (a *App) Compile(fileName string) error {
 	return nil
 }
 
-// Generic deploy smart contracts on specified EVM-compatible chain.
-func (a *App) Deploy(fileName string, args []string) error {
-	name := utils.RemoveExtension(fileName)
-	addr, tx, err := a.EVMClient.DeployContract(
-		name,
-		args,
-	)
+func (a *App) Deploy(name string, args []string) (string, string, error) {
+	name = utils.RemoveExtension(name)
+	contractABI, err := utils.GetABIObject(a.getABIPath(name))
 	if err != nil {
-		return fmt.Errorf("deployment error: %w", err)
+		return "", "", err
 	}
-	fmt.Printf(
-		"%s seccessfully deployed. \nTX hash: %s \nContract address: %s\n\n",
-		name,
-		tx.Hash().Hex(),
-		addr.Hex(),
-	)
-	return nil
+	bytecode, err := utils.GetBytecode(a.getBinPath(name))
+	if err != nil {
+		return "", "", err
+	}
+	fmt.Println("here")
+	input, err := utils.CastInputs(contractABI.Constructor.Inputs, args)
+	if err != nil {
+		return "", "", err
+	}
+	txOpts, err := a.EVMClient.GetDefaultTxOptions()
+	if err != nil {
+		return "", "", err
+	}
+	fmt.Println("here")
+	for _, i := range input {
+		fmt.Println(i)
+	}
+	addr, tx, _, err := bind.DeployContract(txOpts, *contractABI, bytecode, a.EVMClient, input...)
+	if err != nil {
+		return "", "", err
+	}
+
+	return addr.Hex(), tx.Hash().Hex(), nil
 }
