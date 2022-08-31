@@ -78,20 +78,15 @@ func (a *App) Deploy(name string, args []string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	fmt.Println("here")
 	input, err := utils.CastInputs(contractABI.Constructor.Inputs, args)
 	if err != nil {
 		return "", "", err
 	}
-	txOpts, err := a.EVMClient.GetDefaultTxOptions()
+	err = a.EVMClient.SetupTxOptions(0, 0)
 	if err != nil {
 		return "", "", err
 	}
-	fmt.Println("here")
-	for _, i := range input {
-		fmt.Println(i)
-	}
-	addr, tx, _, err := bind.DeployContract(txOpts, *contractABI, bytecode, a.EVMClient, input...)
+	addr, tx, _, err := bind.DeployContract(a.EVMClient.Account.Signer, *contractABI, bytecode, a.EVMClient, input...)
 	if err != nil {
 		return "", "", err
 	}
