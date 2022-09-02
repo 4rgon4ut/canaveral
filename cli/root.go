@@ -31,6 +31,7 @@ func NewRootCmd(a *app.App) *RootCmd {
 		transferCommand(a),
 		mintCommand(a),
 		burnCommand(a),
+		callCommand(a),
 
 		// example a.k.a. DEMO command
 		exampleCommand(a),

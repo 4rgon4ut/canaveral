@@ -6,6 +6,7 @@ import (
 	"github.com/canaveral/bindings"
 	"github.com/canaveral/config"
 	evmclient "github.com/canaveral/evmclient"
+	"github.com/canaveral/registry"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -14,6 +15,7 @@ import (
 type App struct {
 	EVMClient *evmclient.Client
 
+	Registry *registry.Registry
 	// ERC20 contract bind which implements ERC20Minimal interface
 	ERC20Instance ERC20Minimal
 
@@ -32,8 +34,13 @@ func New(cfg *config.Config) (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("evm client initialization error: %w", err)
 	}
+	r, err := registry.New("canaveral.db", 0600)
+	if err != nil {
+		return nil, fmt.Errorf("db open error: %w", err)
+	}
 	a := &App{
 		EVMClient: client,
+		Registry:  r,
 
 		binDir:       cfg.BinDir,
 		abiDir:       cfg.ABIDir,

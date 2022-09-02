@@ -21,4 +21,5 @@ func main() {
 	}
 	cli := cli.NewRootCmd(a)
 	cli.Run()
+	defer a.Registry.Close()
 }

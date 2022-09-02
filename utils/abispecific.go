@@ -33,6 +33,16 @@ func GetBytecode(binPath string) ([]byte, error) {
 	return b, nil
 }
 
+// TODO: overloaded methods collision
+func GetMethodByName(contractABI abi.ABI, name string) (abi.Method, bool) {
+	for _, m := range contractABI.Methods {
+		if m.Name == name {
+			return m, true
+		}
+	}
+	return abi.Method{}, false
+}
+
 // Cast types of args([]string) to input types of provided function type.
 // Ignores first two inputs of provided function(starts with index 2) and try to cast
 // inputs respectively:

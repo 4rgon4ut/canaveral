@@ -1,11 +1,13 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"os/exec"
 
 	"github.com/canaveral/utils"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
 )
 
 //nolint:gosec,lll
@@ -90,6 +92,53 @@ func (a *App) Deploy(name string, args []string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-
+	err = a.Registry.AddContract(name, addr)
+	if err != nil {
+		return "", "", fmt.Errorf("registry error: %w", err)
+	}
 	return addr.Hex(), tx.Hash().Hex(), nil
+}
+
+func (a *App) Call(name string, method string, args []string) error {
+	name = utils.RemoveExtension(name)
+	contractABI, err := utils.GetABIObject(a.getABIPath(name))
+	if err != nil {
+		return err
+	}
+	abiMethod, exist := utils.GetMethodByName(*contractABI, method)
+	if !exist {
+		return fmt.Errorf("no such method")
+	}
+	addr, err := a.Registry.GetAddress(name)
+	if err != nil {
+		return err
+	}
+	instance := bind.NewBoundContract(common.HexToAddress(addr), *contractABI, a.EVMClient, a.EVMClient, a.EVMClient)
+	err = a.EVMClient.SetupTxOptions(0, 0)
+	if err != nil {
+		return err
+	}
+	input, err := utils.CastInputs(abiMethod.Inputs, args)
+	if abiMethod.IsConstant() {
+		res := &[]interface{}{}
+		err := instance.Call(nil, res, method, input...)
+		if err != nil {
+			return fmt.Errorf("call error: %w", err)
+		}
+		fmt.Println(res)
+	} else {
+		if err != nil {
+			return fmt.Errorf("inputs casting error: %w", err)
+		}
+		tx, err := instance.Transact(a.EVMClient.Account.Signer, method, input...)
+		if err != nil {
+			return fmt.Errorf("transact error: %w", err)
+		}
+		_, err = bind.WaitMined(context.Background(), a.EVMClient, tx)
+		if err != nil {
+			return fmt.Errorf("tx not mined: %w", err)
+		}
+		fmt.Println("tx mined: %s", tx.Hash().Hex())
+	}
+	return nil
 }
