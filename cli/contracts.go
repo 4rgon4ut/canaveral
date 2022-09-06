@@ -46,7 +46,8 @@ func deployCommand(a *app.App) *cobra.Command {
 
 func callCommand(a *app.App) *cobra.Command {
 	return &cobra.Command{
-		Use:   "call [contract_name] [method] [input]",
+		Use: "call [contract_name] [method] [input]",
+		// TODO: short long
 		Short: "",
 		Long:  ``,
 		Args:  cobra.ArbitraryArgs,

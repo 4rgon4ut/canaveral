@@ -1,7 +1,7 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package bindings
+package ExampleERC20
 
 import (
 	"errors"
@@ -42,8 +42,8 @@ var ExampleERC20ABI = ExampleERC20MetaData.ABI
 // Deprecated: Use ExampleERC20MetaData.Bin instead.
 var ExampleERC20Bin = ExampleERC20MetaData.Bin
 
-// (d Deployer) DeployExampleERC20 deploys a new Ethereum contract, binding an instance of ExampleERC20 to it.
-func (d Deployer) DeployExampleERC20(auth *bind.TransactOpts, backend bind.ContractBackend, name_ string, symbol_ string) (common.Address, *types.Transaction, *ExampleERC20, error) {
+// DeployExampleERC20 deploys a new Ethereum contract, binding an instance of ExampleERC20 to it.
+func DeployExampleERC20(auth *bind.TransactOpts, backend bind.ContractBackend, name_ string, symbol_ string) (common.Address, *types.Transaction, *ExampleERC20, error) {
 	parsed, err := ExampleERC20MetaData.GetAbi()
 	if err != nil {
 		return common.Address{}, nil, nil, err

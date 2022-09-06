@@ -3,21 +3,16 @@ package app
 import (
 	"fmt"
 
-	"github.com/canaveral/bindings"
 	"github.com/canaveral/config"
 	evmclient "github.com/canaveral/evmclient"
 	"github.com/canaveral/registry"
-	"github.com/ethereum/go-ethereum/common"
 )
 
 // App is the core application object.
 // It binds other project components together to perform core functions on hight abstrction level.
 type App struct {
 	EVMClient *evmclient.Client
-
-	Registry *registry.Registry
-	// ERC20 contract bind which implements ERC20Minimal interface
-	ERC20Instance ERC20Minimal
+	Registry  *registry.Registry
 
 	// pack of dirs for proper files generation and management
 	binDir       string
@@ -47,17 +42,5 @@ func New(cfg *config.Config) (*App, error) {
 		bindsDir:     cfg.BindsDir,
 		contractsDir: cfg.ContractsDir,
 	}
-	// checks if config were updated with new deployed example contrct address.
-	// If so, construct bind instance
-	if cfg.ERC20ExampleAddress != "" {
-		var instance *bindings.ExampleERC20
-		instance, _ = bindings.NewExampleERC20(common.HexToAddress(cfg.ERC20ExampleAddress), client)
-		a.UpdateERC20Instance(instance)
-	}
 	return a, nil
-}
-
-// Update ERC20 instance field with new bind
-func (a *App) UpdateERC20Instance(instance ERC20Minimal) {
-	a.ERC20Instance = instance
 }

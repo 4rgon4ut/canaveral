@@ -1,7 +1,7 @@
 // Code generated - DO NOT EDIT.
 // This file is a generated binding and any manual changes will be lost.
 
-package bindings
+package Test
 
 import (
 	"errors"
@@ -42,8 +42,8 @@ var TestABI = TestMetaData.ABI
 // Deprecated: Use TestMetaData.Bin instead.
 var TestBin = TestMetaData.Bin
 
-// (d Deployer) DeployTest deploys a new Ethereum contract, binding an instance of Test to it.
-func (d Deployer) DeployTest(auth *bind.TransactOpts, backend bind.ContractBackend, _number uint16, _word string, _obj [32]byte, _addr common.Address) (common.Address, *types.Transaction, *Test, error) {
+// DeployTest deploys a new Ethereum contract, binding an instance of Test to it.
+func DeployTest(auth *bind.TransactOpts, backend bind.ContractBackend, _number uint16, _word string, _obj [32]byte, _addr common.Address) (common.Address, *types.Transaction, *Test, error) {
 	parsed, err := TestMetaData.GetAbi()
 	if err != nil {
 		return common.Address{}, nil, nil, err

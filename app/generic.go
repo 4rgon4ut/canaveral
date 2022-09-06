@@ -63,10 +63,6 @@ func (a *App) Compile(fileName string) error {
 		a.abiDir,
 		a.binDir,
 	)
-	// patching new bind necessary for ../bindings package names consistence and reflect calls to deploy functions
-	if err := utils.PatchBind(fmt.Sprintf("%s/%s.go", a.bindsDir, name)); err != nil {
-		return fmt.Errorf("patch binding error: %w", err)
-	}
 	return nil
 }
 
