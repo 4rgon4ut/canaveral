@@ -4,7 +4,6 @@ pragma solidity ^0.8.0;
 
 contract Test {
     address public owner;
-
     string public word;
     uint16 public number;
     bytes32 public obj;

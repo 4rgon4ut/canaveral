@@ -88,7 +88,17 @@ func (a *App) Deploy(name string, args []string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	addr, tx, _, err := bind.DeployContract(a.EVMClient.Account.Signer, *contractABI, bytecode, a.EVMClient, input...)
+	_, tx, _, err := bind.DeployContract(
+		a.EVMClient.Account.Signer,
+		*contractABI,
+		common.FromHex(string(bytecode)),
+		a.EVMClient,
+		input...,
+	)
+	if err != nil {
+		return "", "", err
+	}
+	addr, err := bind.WaitDeployed(context.Background(), a.EVMClient, tx)
 	if err != nil {
 		return "", "", err
 	}
@@ -119,17 +129,17 @@ func (a *App) Call(name string, method string, args []string) error {
 		return err
 	}
 	input, err := utils.CastInputs(abiMethod.Inputs, args)
+	if err != nil {
+		return fmt.Errorf("inputs casting error: %w", err)
+	}
 	if abiMethod.IsConstant() {
 		res := &[]interface{}{}
 		err := instance.Call(nil, res, method, input...)
 		if err != nil {
 			return fmt.Errorf("call error: %w", err)
 		}
-		fmt.Println(res)
+		fmt.Println(*res...)
 	} else {
-		if err != nil {
-			return fmt.Errorf("inputs casting error: %w", err)
-		}
 		tx, err := instance.Transact(a.EVMClient.Account.Signer, method, input...)
 		if err != nil {
 			return fmt.Errorf("transact error: %w", err)
@@ -138,7 +148,7 @@ func (a *App) Call(name string, method string, args []string) error {
 		if err != nil {
 			return fmt.Errorf("tx not mined: %w", err)
 		}
-		fmt.Println("tx mined: %s", tx.Hash().Hex())
+		fmt.Printf("tx mined: %x", tx.Hash())
 	}
 	return nil
 }
