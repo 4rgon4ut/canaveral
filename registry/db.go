@@ -11,6 +11,7 @@ type Registry struct {
 	*bolt.DB
 }
 
+// Creates new boltDB file with bucket 'Contracts'
 func New(path string, mode fs.FileMode) (*Registry, error) {
 	// Open the my.db data file in your current directory.
 	// It will be created if it doesn't exist.
@@ -29,6 +30,4 @@ func New(path string, mode fs.FileMode) (*Registry, error) {
 		return nil, err
 	}
 	return &Registry{db}, nil
-	// TODO:
-	// defer db.Close()
 }
