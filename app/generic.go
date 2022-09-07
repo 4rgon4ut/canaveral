@@ -10,11 +10,12 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 )
 
-//nolint:gosec,lll
 // Uses solc (solidity compiller) to compile *.sol contract by provided name into *.abi and *.bin files.
 // After success compilation uses abigen tool to create *.go bind file from compilled objects.
 //
 // Writes steps info to stdout and patches generated Go contract binding to be accesible thrue reflect calls.
+//
+//nolint:gosec,lll
 func (a *App) Compile(fileName string) error {
 	name := utils.RemoveExtension(fileName)
 	if fileName == "" {
@@ -66,6 +67,11 @@ func (a *App) Compile(fileName string) error {
 	return nil
 }
 
+// Generic contract deploy function.
+// Loads contract ABI & bin representations by provided name and configured paths.
+// Deploys contracts on pre-configured network.
+//
+// Returns contract address and tx hash.
 func (a *App) Deploy(name string, args []string) (string, string, error) {
 	name = utils.RemoveExtension(name)
 	contractABI, err := utils.GetABIObject(a.getABIPath(name))
@@ -80,12 +86,12 @@ func (a *App) Deploy(name string, args []string) (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	err = a.EVMClient.SetupTxOptions(0, 0)
+	txOpts, err := a.EVMClient.GetDefaultTxOptions()
 	if err != nil {
 		return "", "", err
 	}
 	_, tx, _, err := bind.DeployContract(
-		a.EVMClient.Account.Signer,
+		txOpts,
 		*contractABI,
 		common.FromHex(string(bytecode)),
 		a.EVMClient,
@@ -105,6 +111,12 @@ func (a *App) Deploy(name string, args []string) (string, string, error) {
 	return addr.Hex(), tx.Hash().Hex(), nil
 }
 
+// Call make calls to contract functions.
+// Searches for method in contract ABI by provided method name.
+//
+// If method is view/pure perform contract.Call and prints results.
+//
+// If method is changing the state perform transaction.
 func (a *App) Call(name string, method string, args []string) error {
 	name = utils.RemoveExtension(name)
 	contractABI, err := utils.GetABIObject(a.getABIPath(name))
@@ -120,7 +132,7 @@ func (a *App) Call(name string, method string, args []string) error {
 		return err
 	}
 	instance := bind.NewBoundContract(common.HexToAddress(addr), *contractABI, a.EVMClient, a.EVMClient, a.EVMClient)
-	err = a.EVMClient.SetupTxOptions(0, 0)
+	txOpts, err := a.EVMClient.GetDefaultTxOptions()
 	if err != nil {
 		return err
 	}
@@ -136,7 +148,7 @@ func (a *App) Call(name string, method string, args []string) error {
 		}
 		fmt.Println(*res...)
 	} else {
-		tx, err := instance.Transact(a.EVMClient.Account.Signer, method, input...)
+		tx, err := instance.Transact(txOpts, method, input...)
 		if err != nil {
 			return fmt.Errorf("transact error: %w", err)
 		}

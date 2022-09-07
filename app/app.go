@@ -8,6 +8,9 @@ import (
 	"github.com/canaveral/registry"
 )
 
+//nolint:gofumpt
+const FileMode = 0600
+
 // App is the core application object.
 // It binds other project components together to perform core functions on hight abstrction level.
 type App struct {
@@ -29,7 +32,7 @@ func New(cfg *config.Config) (*App, error) {
 	if err != nil {
 		return nil, fmt.Errorf("evm client initialization error: %w", err)
 	}
-	r, err := registry.New("canaveral.db", 0600)
+	r, err := registry.New("canaveral.db", FileMode)
 	if err != nil {
 		return nil, fmt.Errorf("db open error: %w", err)
 	}

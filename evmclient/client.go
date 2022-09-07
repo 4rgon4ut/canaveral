@@ -58,6 +58,7 @@ func (c *Client) SetupTxOptions(msgValue int64, gasLimit int) error {
 	return nil
 }
 
+// Update and returns TransactOpts with gas suggested gas price abd gas limit estimation
 func (c *Client) GetDefaultTxOptions() (*bind.TransactOpts, error) {
 	err := c.SetupTxOptions(0, 0)
 	if err != nil {
