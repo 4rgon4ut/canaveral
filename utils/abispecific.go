@@ -24,16 +24,14 @@ func GetABIObject(abiPath string) (*abi.ABI, error) {
 	return &evmABI, nil
 }
 
-// TODO: deprecate?
+// Takes path to the *.bin file, read file and returns byte array representation
 func GetBytecode(binPath string) ([]byte, error) {
-	b, err := os.ReadFile(binPath)
-	if err != nil {
-		return nil, err
-	}
-	return b, nil
+	return os.ReadFile(binPath)
 }
 
+// Searches for method with provided name in contract ABI
 // TODO: overloaded methods collision
+// TODO: not efficient
 func GetMethodByName(contractABI abi.ABI, name string) (abi.Method, bool) {
 	for _, m := range contractABI.Methods {
 		if m.Name == name {
@@ -43,11 +41,9 @@ func GetMethodByName(contractABI abi.ABI, name string) (abi.Method, bool) {
 	return abi.Method{}, false
 }
 
-// Cast types of args([]string) to input types of provided function type.
-// Ignores first two inputs of provided function(starts with index 2) and try to cast
-// inputs respectively:
+// Cast types of args([ ]string) to types of provided [ ]Arguments.
 //
-// funcType(_, _, type1, type2, ...) --> args[0].(type1), args[1].(type2), ...
+// abiArgs[ Argument{Type: type1}, Argument{Type: type2} ] --> args[0].(type1), args[1].(type2), ...
 //
 // Function supports only several types(any <uintX>, <string>), plus ETH <common.Address> and <[32]byte>
 // and is not safe to buffer overflow
@@ -56,12 +52,9 @@ func GetMethodByName(contractABI abi.ABI, name string) (abi.Method, bool) {
 // TODO: spread supported types number
 func CastInputs(abiArgs abi.Arguments, args []string) ([]interface{}, error) {
 	assertedArgs := make([]interface{}, len(args))
-	// +2 to args index here to match arguments properly
-	// Deploy<ContractName>(auth *bind.TransactOpts, backend bind.ContractBackend, ... ) always have first two arguments
-	// here me casting only contract constructor inputs
 	for i, arg := range abiArgs {
 		stringArg := args[i]
-		// string representation of argument to find a match
+		// string representation of solidity type to find a match
 		switch arg.Type.String() {
 		case "uint8":
 			u64, err := strconv.ParseUint(stringArg, 10, 32)
