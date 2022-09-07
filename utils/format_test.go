@@ -21,10 +21,4 @@ var _ = Describe("Format", func() {
 			Expect(utils.RemoveExtension(fileNameWithDotExtended)).To(Equal(fileNameWithDot))
 		})
 	})
-
-	Context("PatchBind", func() {
-		It("should return error on invalid filepath", func() {
-			Expect(utils.PatchBind("fwfeewfwef")).Error()
-		})
-	})
 })

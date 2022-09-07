@@ -16,7 +16,7 @@ var _ = Describe("Config", func() {
 		predefined = &config.Config{
 			RPCAddr:    "http://0.0.0.0",
 			RPCPort:    "8545",
-			PrivateKey: "41221710A88C7284D5F5BDE53311CDFA22B20F2724F3F4DA60FE3F567669DF56",
+			PrivateKey: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
 
 			BinDir:       "artifacts/bin",
 			ABIDir:       "artifacts/abi",
@@ -28,7 +28,7 @@ var _ = Describe("Config", func() {
 	})
 	Context("with right config path, name and type", func() {
 		It("predifined and loaded configs should be equal", func() {
-			loaded, _ := config.Init(".", "config", "toml")
+			loaded, _ := config.Init(".", "config.example", "toml")
 			Expect(loaded.RPCAddr).To(Equal(predefined.RPCAddr))
 			Expect(loaded.RPCPort).To(Equal(predefined.RPCPort))
 			Expect(loaded.PrivateKey).To(Equal(predefined.PrivateKey))

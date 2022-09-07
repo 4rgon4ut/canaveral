@@ -53,7 +53,7 @@ func (c *Client) SetupTxOptions(msgValue int64, gasLimit int) error {
 	}
 	c.Account.Signer.Nonce = big.NewInt(int64(nonce))
 	c.Account.Signer.Value = big.NewInt(msgValue) // in wei
-	c.Account.Signer.GasLimit = uint64(1e18)      // in units
+	c.Account.Signer.GasLimit = uint64(gasLimit)  // in units
 	c.Account.Signer.GasPrice = gasPrice
 	return nil
 }

@@ -62,6 +62,8 @@ test: deps ## Runs all tests
 install: deps ## Install canaveral cli to go binaries dir
 	CGO_ENABLED=0 GOARCH=${GOARCH}
 	go install cmd/canaveral.go
+	export GOPATH="$HOME/go"
+	export PATH="$PATH:$GOPATH/bin"
 
 clean: ## Clean generated artifacts
 	rm -rf ./artifacts/bin/

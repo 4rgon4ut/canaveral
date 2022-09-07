@@ -43,3 +43,20 @@ func deployCommand(a *app.App) *cobra.Command {
 		},
 	}
 }
+
+func callCommand(a *app.App) *cobra.Command {
+	return &cobra.Command{
+		Use: "call [contract_name] [method] [input]",
+		// TODO: short long
+		Short: "",
+		Long:  ``,
+		Args:  cobra.ArbitraryArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			if err := a.Call(args[0], args[1], args[2:]); err != nil {
+				fmt.Println(err)
+				return err
+			}
+			return nil
+		},
+	}
+}
