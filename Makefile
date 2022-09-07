@@ -55,7 +55,8 @@ deps: contract-tools ## Install all necessary dependencie
 lint: deps ## Runs linting tool
 	golangci-lint run  --timeout 5m
 
-test: deps ## Runs all tests
+test: ## Runs all tests
+	go mod download
 	ginkgo ./...
 	go mod tidy
 
