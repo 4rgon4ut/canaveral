@@ -51,19 +51,26 @@ func GetMethodByName(contractABI abi.ABI, name string) (abi.Method, bool) {
 // TODO: add checks for resulting types overflow
 // TODO: spread supported types number
 func CastInputs(abiArgs abi.Arguments, args []string) ([]interface{}, error) {
-	assertedArgs := make([]interface{}, len(args))
+	argsLen := len(args)
+	abiArgsLen := len(abiArgs)
+
+	if abiArgsLen != argsLen {
+		return nil, fmt.Errorf("ivalid arguments number: expect %d got %d", abiArgsLen, argsLen)
+	}
+
+	assertedArgs := make([]interface{}, argsLen)
 	for i, arg := range abiArgs {
 		stringArg := args[i]
 		// string representation of solidity type to find a match
 		switch arg.Type.String() {
 		case "uint8":
-			u64, err := strconv.ParseUint(stringArg, 10, 32)
+			u64, err := strconv.ParseUint(stringArg, 10, 8)
 			if err != nil {
 				return nil, err
 			}
 			assertedArgs[i] = uint8(u64)
 		case "uint16":
-			u64, err := strconv.ParseUint(stringArg, 10, 32)
+			u64, err := strconv.ParseUint(stringArg, 10, 16)
 			if err != nil {
 				return nil, err
 			}
@@ -75,14 +82,12 @@ func CastInputs(abiArgs abi.Arguments, args []string) ([]interface{}, error) {
 			}
 			assertedArgs[i] = uint32(u64)
 		case "uint64":
-			u64, err := strconv.ParseUint(stringArg, 10, 32)
+			u64, err := strconv.ParseUint(stringArg, 10, 64)
 			if err != nil {
 				return nil, err
 			}
 			assertedArgs[i] = u64
-		case "uint128":
-			fallthrough // EVM u128 & u256 both represented as big.Int in Go
-		case "uint256":
+		case "uint256", "uint128":
 			n := new(big.Int)
 			n, ok := n.SetString(stringArg, 10)
 			if !ok {
@@ -92,11 +97,17 @@ func CastInputs(abiArgs abi.Arguments, args []string) ([]interface{}, error) {
 		case "string":
 			assertedArgs[i] = stringArg
 		case "address":
+			if !common.IsHexAddress(stringArg) {
+				return nil, fmt.Errorf("invalid address provided: %x", stringArg)
+			}
 			assertedArgs[i] = common.HexToAddress(stringArg)
 		case "bytes32":
 			var param [32]uint8
 			copy(param[:], stringArg)
 			assertedArgs[i] = param
+
+		default:
+			return nil, fmt.Errorf("unsupported input type")
 		}
 	}
 	return assertedArgs, nil

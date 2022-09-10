@@ -46,10 +46,9 @@ func deployCommand(a *app.App) *cobra.Command {
 
 func callCommand(a *app.App) *cobra.Command {
 	return &cobra.Command{
-		Use: "call [contract_name] [method] [input]",
-		// TODO: short long
-		Short: "",
-		Long:  ``,
+		Use:   "call [contract_name] [method] [input]",
+		Short: "make contract call by method name",
+		Long:  `calls contracts method by name with provided arguments`,
 		Args:  cobra.ArbitraryArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := a.Call(args[0], args[1], args[2:]); err != nil {
