@@ -1,7 +1,7 @@
+# Welcome to Canaveral!
 ![image](https://user-images.githubusercontent.com/59182467/188896738-ed1c1eae-08c4-4579-afe7-a6ebc35c1be3.png)
 
 
-# Welcome to Canaveral!
 Canaveral is a cli tool written in Go for compiling, deploying and making calls to solidity smart contracts on Evmos blockchain
 (potentially on every EVM-compatible chain).
 
